@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vinculia-backend"
+version = "1.0.0"
+description = "Plataforma SaaS multidisciplinaria de estimulación cognitiva y motora para profesionales"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Vinculia Team" }
+]
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "sqlalchemy>=2.0.28",
+    "greenlet>=3.0.0",
+    "asyncpg>=0.29.0",
+    "pydantic>=2.6.0",
+    "email-validator>=2.0.0",
+    "pydantic-settings>=2.2.0",
+    "pyjwt>=2.8.0",
+    "bcrypt>=4.1.2",
+    "httpx>=0.27.0",
+    "python-multipart>=0.0.9",
+    "loguru>=0.7.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
