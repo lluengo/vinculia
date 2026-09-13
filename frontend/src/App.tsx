@@ -6,6 +6,10 @@ import { PublicRoute } from './components/PublicRoute';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { PacientesPage } from './pages/PacientesPage';
+import { ActividadesPage } from './pages/ActividadesPage';
+import { ConfiguradorPage } from './pages/ConfiguradorPage';
+import { PlayPage } from './pages/PlayPage';
 
 export const App: React.FC = () => {
   return (
@@ -18,9 +22,16 @@ export const App: React.FC = () => {
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 
-          {/* Rutas Protegidas (requieren token JWT válido) */}
+          {/* Ruta Pública de Juego (Acceso directo para niños mediante Enlace Único con Token) */}
+          <Route path="/play/:token" element={<PlayPage />} />
+
+          {/* Rutas Protegidas (requieren token JWT del profesional) */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/pacientes" element={<PacientesPage />} />
+            <Route path="/actividades" element={<ActividadesPage />} />
+            <Route path="/actividades/nueva" element={<ConfiguradorPage />} />
+            <Route path="/actividades/:id/editar" element={<ConfiguradorPage />} />
           </Route>
 
           {/* Redirección por defecto */}

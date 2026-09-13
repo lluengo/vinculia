@@ -117,20 +117,31 @@ export const DashboardPage: React.FC = () => {
           <p className="text-slate-600 text-sm mb-6">
             Los siguientes bloques del sistema ya tienen sus tablas mapeadas en la base de datos y están listos para implementarse:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-blue-100 shadow-xs">
-              <h3 className="font-bold text-slate-800 text-sm">1. Gestión de Pacientes</h3>
-              <p className="text-xs text-slate-500 mt-1">Seudónimos y edades conforme a normativas de privacidad.</p>
-            </div>
-            <div className="bg-white p-4 rounded-xl border border-blue-100 shadow-xs">
-              <h3 className="font-bold text-slate-800 text-sm">2. Plantilla de Estímulos</h3>
-              <p className="text-xs text-slate-500 mt-1">Asociación y discriminación cognitiva configurable.</p>
-            </div>
-            <div className="bg-white p-4 rounded-xl border border-blue-100 shadow-xs">
-              <h3 className="font-bold text-slate-800 text-sm">3. Enlaces sin Login</h3>
-              <p className="text-xs text-slate-500 mt-1">Acceso directo para niños con métricas en tiempo real.</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              onClick={() => navigate('/pacientes')}
+              className="bg-white p-5 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:border-blue-400 transition text-left cursor-pointer group"
+            >
+              <h3 className="font-bold text-slate-800 text-sm group-hover:text-blue-600 transition">
+                1. Gestión de Pacientes ➔
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Registra y administra las fichas de los niños con seudónimos y edades (cumplimiento GDPR).
+              </p>
+            </button>
+            <button
+              onClick={() => navigate('/actividades')}
+              className="bg-white p-5 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:border-blue-400 transition text-left cursor-pointer group"
+            >
+              <h3 className="font-bold text-slate-800 text-sm group-hover:text-blue-600 transition">
+                2. Plantillas de Ejercicios ➔
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Diseña ejercicios de asociación, ajusta dificultad táctil y genera enlaces únicos para el juego.
+              </p>
+            </button>
           </div>
+
         </div>
       </main>
     </div>

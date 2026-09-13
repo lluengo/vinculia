@@ -108,3 +108,85 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Endpoints de Pacientes
+export const getPacientes = async (page = 1, size = 10) => {
+  const response = await api.get(`/pacientes?page=${page}&size=${size}`);
+  return response.data;
+};
+
+export const getPaciente = async (id: string) => {
+  const response = await api.get(`/pacientes/${id}`);
+  return response.data;
+};
+
+export const createPaciente = async (data: { apodo: string; edad?: number | null }) => {
+  const response = await api.post('/pacientes', data);
+  return response.data;
+};
+
+export const updatePaciente = async (id: string, data: { apodo?: string; edad?: number | null }) => {
+  const response = await api.patch(`/pacientes/${id}`, data);
+  return response.data;
+};
+
+export const deletePaciente = async (id: string) => {
+  const response = await api.delete(`/pacientes/${id}`);
+  return response.data;
+};
+
+// Endpoints de Actividades
+export const getActividades = async (params?: { paciente_id?: string; tipo?: string; page?: number; size?: number }) => {
+  const response = await api.get('/actividades', { params });
+  return response.data;
+};
+
+export const getActividad = async (id: string) => {
+  const response = await api.get(`/actividades/${id}`);
+  return response.data;
+};
+
+export const createActividad = async (data: any) => {
+  const response = await api.post('/actividades', data);
+  return response.data;
+};
+
+export const updateActividad = async (id: string, data: any) => {
+  const response = await api.patch(`/actividades/${id}`, data);
+  return response.data;
+};
+
+export const deleteActividad = async (id: string) => {
+  const response = await api.delete(`/actividades/${id}`);
+  return response.data;
+};
+
+export const generarEnlace = async (id: string) => {
+  const response = await api.post(`/actividades/${id}/enlace`);
+  return response.data;
+};
+
+export const subirAssets = async (id: string, formData: FormData) => {
+  const response = await api.post(`/actividades/${id}/assets`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+// Endpoints Públicos (para pacientes / juego)
+export const getActividadPublica = async (token: string) => {
+  const response = await api.get(`/publico/actividades/${token}`);
+  return response.data;
+};
+
+export const crearSesionPublica = async (data: {
+  actividad_id?: string;
+  token?: string;
+  tiempo_segundos: number;
+  aciertos: number;
+  errores: number;
+}) => {
+  const response = await api.post('/publico/sesiones', data);
+  return response.data;
+};
+

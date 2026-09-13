@@ -12,6 +12,10 @@ from app.domain.ports.profesional_repository import ProfesionalRepositoryPort
 from app.domain.exceptions import InvalidTokenException, DomainException
 from app.infrastructure.db.repositories.sql_profesional_repository import SqlProfesionalRepository
 from app.infrastructure.oauth.google_client import GoogleOAuthClient
+from app.domain.ports.paciente_repository import PacienteRepositoryPort
+from app.domain.ports.actividad_repository import ActividadRepositoryPort
+from app.infrastructure.db.repositories.sql_paciente_repository import SqlPacienteRepository
+from app.infrastructure.db.repositories.sql_actividad_repository import SqlActividadRepository
 from app.application.use_cases import (
     RegisterProfesionalUseCase,
     LoginProfesionalUseCase,
@@ -19,7 +23,20 @@ from app.application.use_cases import (
     GetCurrentProfesionalUseCase,
     AuthenticateGoogleUseCase,
     LogoutProfesionalUseCase,
+    CreatePacienteUseCase,
+    ListPacientesUseCase,
+    GetPacienteUseCase,
+    UpdatePacienteUseCase,
+    DeletePacienteUseCase,
+    CreateActividadUseCase,
+    ListActividadesUseCase,
+    GetActividadUseCase,
+    UpdateActividadUseCase,
+    DeleteActividadUseCase,
+    GenerarEnlaceUseCase,
+    GetActividadPublicaUseCase,
 )
+
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login/form",
@@ -31,6 +48,94 @@ def get_profesional_repository(
     session: Annotated[AsyncSession, Depends(get_db)]
 ) -> ProfesionalRepositoryPort:
     return SqlProfesionalRepository(session)
+
+
+def get_paciente_repository(
+    session: Annotated[AsyncSession, Depends(get_db)]
+) -> PacienteRepositoryPort:
+    return SqlPacienteRepository(session)
+
+
+def get_actividad_repository(
+    session: Annotated[AsyncSession, Depends(get_db)]
+) -> ActividadRepositoryPort:
+    return SqlActividadRepository(session)
+
+
+def get_create_paciente_use_case(
+    repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)]
+) -> CreatePacienteUseCase:
+    return CreatePacienteUseCase(repo)
+
+
+def get_list_pacientes_use_case(
+    repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)]
+) -> ListPacientesUseCase:
+    return ListPacientesUseCase(repo)
+
+
+def get_paciente_use_case(
+    repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)]
+) -> GetPacienteUseCase:
+    return GetPacienteUseCase(repo)
+
+
+def get_update_paciente_use_case(
+    repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)]
+) -> UpdatePacienteUseCase:
+    return UpdatePacienteUseCase(repo)
+
+
+def get_delete_paciente_use_case(
+    repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)]
+) -> DeletePacienteUseCase:
+    return DeletePacienteUseCase(repo)
+
+
+def get_create_actividad_use_case(
+    repo: Annotated[ActividadRepositoryPort, Depends(get_actividad_repository)],
+    paciente_repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)],
+) -> CreateActividadUseCase:
+    return CreateActividadUseCase(repo, paciente_repo)
+
+
+def get_list_actividades_use_case(
+    repo: Annotated[ActividadRepositoryPort, Depends(get_actividad_repository)]
+) -> ListActividadesUseCase:
+    return ListActividadesUseCase(repo)
+
+
+def get_actividad_use_case(
+    repo: Annotated[ActividadRepositoryPort, Depends(get_actividad_repository)]
+) -> GetActividadUseCase:
+    return GetActividadUseCase(repo)
+
+
+def get_update_actividad_use_case(
+    repo: Annotated[ActividadRepositoryPort, Depends(get_actividad_repository)],
+    paciente_repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)],
+) -> UpdateActividadUseCase:
+    return UpdateActividadUseCase(repo, paciente_repo)
+
+
+def get_delete_actividad_use_case(
+    repo: Annotated[ActividadRepositoryPort, Depends(get_actividad_repository)]
+) -> DeleteActividadUseCase:
+    return DeleteActividadUseCase(repo)
+
+
+def get_generar_enlace_use_case(
+    repo: Annotated[ActividadRepositoryPort, Depends(get_actividad_repository)]
+) -> GenerarEnlaceUseCase:
+    return GenerarEnlaceUseCase(repo)
+
+
+def get_actividad_publica_use_case(
+    repo: Annotated[ActividadRepositoryPort, Depends(get_actividad_repository)],
+    paciente_repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)],
+) -> GetActividadPublicaUseCase:
+    return GetActividadPublicaUseCase(repo, paciente_repo)
+
 
 
 def get_google_client() -> GoogleOAuthClient:

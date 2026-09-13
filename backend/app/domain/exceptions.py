@@ -33,3 +33,30 @@ class GoogleAuthException(DomainException):
     """Lanzada cuando falla la validación con Google OAuth."""
     def __init__(self, message: str = "Error en la autenticación con Google."):
         super().__init__(message)
+
+
+class PacienteNotFoundException(DomainException):
+    """Lanzada cuando no se encuentra un paciente."""
+    def __init__(self, identifier: str = ""):
+        super().__init__(f"Paciente no encontrado: {identifier}")
+        self.identifier = identifier
+
+
+class ActividadNotFoundException(DomainException):
+    """Lanzada cuando no se encuentra una actividad."""
+    def __init__(self, identifier: str = ""):
+        super().__init__(f"Actividad no encontrada: {identifier}")
+        self.identifier = identifier
+
+
+class TokenInvalidoException(DomainException):
+    """Lanzada cuando un token de actividad es inexistente, inválido o ha expirado."""
+    def __init__(self, message: str = "Enlace no válido o expirado."):
+        super().__init__(message)
+
+
+class ActividadInvalidaException(DomainException):
+    """Lanzada cuando los datos de configuración o pares de una actividad son inválidos."""
+    def __init__(self, message: str = "Datos de actividad inválidos."):
+        super().__init__(message)
+

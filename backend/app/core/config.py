@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
     # Base de Datos PostgreSQL
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:Holamundo1123!@localhost:5432/vinculia"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:Holamundo1123!@localhost:5433/vinculia"
     
     # Google OAuth
     GOOGLE_CLIENT_ID: str = "mock-google-client-id.apps.googleusercontent.com"

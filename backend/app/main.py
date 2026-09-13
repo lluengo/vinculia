@@ -1,6 +1,8 @@
+import os
 import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
 from app.core.config import settings
@@ -23,6 +25,22 @@ tags_metadata = [
     {
         "name": "Profesionales",
         "description": "Gestión y consulta del perfil del profesional.",
+    },
+    {
+        "name": "Pacientes",
+        "description": "Gestión de pacientes del profesional.",
+    },
+    {
+        "name": "Actividades",
+        "description": "Creación y gestión de actividades terapéuticas (Plantilla 1: Asociación).",
+    },
+    {
+        "name": "Enlaces",
+        "description": "Generación y administración de enlaces únicos para pacientes.",
+    },
+    {
+        "name": "Público",
+        "description": "Acceso público para pacientes (juego de actividades y registro de resultados sin autenticación).",
     },
     {
         "name": "Sistema",
@@ -49,6 +67,10 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+# Asegurar directorio de almacenamiento y montar archivos estáticos
+os.makedirs("storage", exist_ok=True)
+app.mount("/static", StaticFiles(directory="storage"), name="static")
 
 # Endpoint de salud del sistema
 @app.get("/health", tags=["Sistema"])

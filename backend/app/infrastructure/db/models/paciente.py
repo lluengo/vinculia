@@ -8,6 +8,7 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.infrastructure.db.models.profesional import ProfesionalModel
+    from app.infrastructure.db.models.actividad import ActividadModel
     from app.infrastructure.db.models.sesion_juego import SesionJuegoModel
 
 
@@ -40,11 +41,23 @@ class PacienteModel(Base):
         server_default=func.now(),
         nullable=True
     )
+    eliminado_en: Mapped[Optional[datetime]] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+    ultima_sesion: Mapped[Optional[datetime]] = mapped_column(
+        DateTime,
+        nullable=True
+    )
 
     # Relaciones
     profesional: Mapped[Optional["ProfesionalModel"]] = relationship(
         "ProfesionalModel",
         back_populates="pacientes"
+    )
+    actividades: Mapped[List["ActividadModel"]] = relationship(
+        "ActividadModel",
+        back_populates="paciente"
     )
     sesiones_juego: Mapped[List["SesionJuegoModel"]] = relationship(
         "SesionJuegoModel",
