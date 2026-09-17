@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { getActividadPublica, crearSesionPublica } from '../services/api';
 import { ActividadPublica } from '../types';
 import { Trophy, Clock, CheckCircle2, RotateCcw, AlertTriangle } from 'lucide-react';
+import { MediaViewer, isAudioUrl } from '../components/MediaViewer';
+import { resolveMediaUrl } from '../services/api';
 
 
 export const PlayPage: React.FC = () => {
@@ -54,12 +56,26 @@ export const PlayPage: React.FC = () => {
     return () => clearInterval(timer);
   }, [completed, secondsLeft, actividad]);
 
+  const playSound = (url: string) => {
+    try {
+      const audio = new Audio(resolveMediaUrl(url));
+      audio.play().catch(() => {});
+    } catch {}
+  };
+
   const handleSelectOrigen = (origen: string) => {
     if (completed) return;
     setSelectedOrigen(origen);
+    if (isAudioUrl(origen)) {
+      playSound(origen);
+    }
   };
 
   const handleSelectDestino = (destino: string) => {
+    if (isAudioUrl(destino) || actividad?.modo === 'imagen-sonido') {
+      playSound(destino);
+    }
+
     if (!selectedOrigen || completed) return;
 
     // Verificar si es par correcto
@@ -202,7 +218,7 @@ export const PlayPage: React.FC = () => {
                       key={i}
                       disabled={isMatched}
                       onClick={() => handleSelectOrigen(par.origen_url)}
-                      className={`w-full p-5 rounded-2xl font-bold text-base transition-all duration-200 text-left flex items-center justify-between border-2 ${
+                      className={`w-full p-4 rounded-2xl font-bold text-base transition-all duration-200 text-left flex items-center justify-between border-2 ${
                         isMatched
                           ? 'bg-emerald-50 border-emerald-300 text-emerald-800 opacity-60 cursor-default'
                           : isSelected
@@ -210,8 +226,13 @@ export const PlayPage: React.FC = () => {
                           : 'bg-white border-slate-200 text-slate-700 hover:border-blue-400 shadow-sm'
                       }`}
                     >
-                      <span className="truncate">{par.origen_url}</span>
-                      {isMatched && <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+                      <div className="flex items-center gap-3 truncate">
+                        <MediaViewer
+                          content={par.origen_url}
+                          className={isSelected ? 'text-white' : ''}
+                        />
+                      </div>
+                      {isMatched && <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />}
                     </button>
                   );
                 })}
@@ -228,25 +249,32 @@ export const PlayPage: React.FC = () => {
                   const isMatched = Object.values(asociaciones).includes(par.destino_url);
 
                   return (
-                    <button
+                    <div
                       key={i}
-                      disabled={isMatched || !selectedOrigen}
-                      onClick={() => handleSelectDestino(par.destino_url)}
-                      className={`w-full p-5 rounded-2xl font-bold text-base transition-all duration-200 text-right flex items-center justify-between border-2 ${
+                      className={`w-full p-4 rounded-2xl font-bold text-base transition-all duration-200 flex items-center justify-between border-2 ${
                         isMatched
                           ? 'bg-emerald-50 border-emerald-300 text-emerald-800 opacity-60 cursor-default'
                           : selectedOrigen
                           ? 'bg-white border-dashed border-blue-300 text-slate-700 hover:bg-blue-50 hover:border-blue-500 cursor-pointer'
                           : 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
                       }`}
+                      onClick={() => handleSelectDestino(par.destino_url)}
                     >
-                      {isMatched ? (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                      ) : (
-                        <span className="text-xs font-normal text-slate-400">Unir aquí</span>
-                      )}
-                      <span className="truncate">{par.destino_url}</span>
-                    </button>
+                      <div className="flex items-center gap-2">
+                        {isMatched ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                        ) : (
+                          <span className="text-xs font-normal text-slate-400">Unir aquí</span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <MediaViewer
+                          content={par.destino_url}
+                          isAudioDestino={actividad.modo === 'imagen-sonido'}
+                        />
+                      </div>
+                    </div>
                   );
                 })}
               </div>

@@ -16,6 +16,8 @@ from app.domain.ports.paciente_repository import PacienteRepositoryPort
 from app.domain.ports.actividad_repository import ActividadRepositoryPort
 from app.infrastructure.db.repositories.sql_paciente_repository import SqlPacienteRepository
 from app.infrastructure.db.repositories.sql_actividad_repository import SqlActividadRepository
+from app.domain.ports.metrica_repository import MetricaRepositoryPort
+from app.infrastructure.db.repositories.sql_metrica_repository import SqlMetricaRepository
 from app.application.use_cases import (
     RegisterProfesionalUseCase,
     LoginProfesionalUseCase,
@@ -35,6 +37,12 @@ from app.application.use_cases import (
     DeleteActividadUseCase,
     GenerarEnlaceUseCase,
     GetActividadPublicaUseCase,
+    GetPacienteResumenMetricasUseCase,
+    GetPacienteEvolucionUseCase,
+    GetPacientePorActividadUseCase,
+    ExportarSesionesPacienteUseCase,
+    GetGlobalResumenUseCase,
+    GetRankingPacientesUseCase,
 )
 
 
@@ -135,6 +143,48 @@ def get_actividad_publica_use_case(
     paciente_repo: Annotated[PacienteRepositoryPort, Depends(get_paciente_repository)],
 ) -> GetActividadPublicaUseCase:
     return GetActividadPublicaUseCase(repo, paciente_repo)
+
+
+def get_metrica_repository(
+    session: Annotated[AsyncSession, Depends(get_db)]
+) -> MetricaRepositoryPort:
+    return SqlMetricaRepository(session)
+
+
+def get_paciente_resumen_metricas_use_case(
+    repo: Annotated[MetricaRepositoryPort, Depends(get_metrica_repository)]
+) -> GetPacienteResumenMetricasUseCase:
+    return GetPacienteResumenMetricasUseCase(repo)
+
+
+def get_paciente_evolucion_use_case(
+    repo: Annotated[MetricaRepositoryPort, Depends(get_metrica_repository)]
+) -> GetPacienteEvolucionUseCase:
+    return GetPacienteEvolucionUseCase(repo)
+
+
+def get_paciente_por_actividad_use_case(
+    repo: Annotated[MetricaRepositoryPort, Depends(get_metrica_repository)]
+) -> GetPacientePorActividadUseCase:
+    return GetPacientePorActividadUseCase(repo)
+
+
+def get_exportar_sesiones_paciente_use_case(
+    repo: Annotated[MetricaRepositoryPort, Depends(get_metrica_repository)]
+) -> ExportarSesionesPacienteUseCase:
+    return ExportarSesionesPacienteUseCase(repo)
+
+
+def get_global_resumen_use_case(
+    repo: Annotated[MetricaRepositoryPort, Depends(get_metrica_repository)]
+) -> GetGlobalResumenUseCase:
+    return GetGlobalResumenUseCase(repo)
+
+
+def get_ranking_pacientes_use_case(
+    repo: Annotated[MetricaRepositoryPort, Depends(get_metrica_repository)]
+) -> GetRankingPacientesUseCase:
+    return GetRankingPacientesUseCase(repo)
 
 
 

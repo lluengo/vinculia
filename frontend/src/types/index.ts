@@ -60,3 +60,58 @@ export interface ActividadPublica {
   configuracion: Configuracion;
   apodo_paciente?: string | null;
 }
+
+export interface PacienteInfo {
+  id: string;
+  apodo: string;
+  edad?: number | null;
+}
+
+export interface UltimaSesion {
+  fecha?: string | null;
+  tiempo: number;
+  aciertos: number;
+  errores: number;
+}
+
+export interface PacienteResumenMetricas {
+  paciente: PacienteInfo;
+  total_sesiones: number;
+  tiempo_promedio_seg: number;
+  tasa_acierto_promedio: number;
+  ultima_sesion?: UltimaSesion | null;
+  tendencia: 'mejora' | 'estable' | 'retroceso' | 'sin_datos';
+}
+
+export interface EvolucionItem {
+  fecha: string;
+  sesiones: number;
+  tiempo_promedio: number;
+  tasa_acierto: number;
+}
+
+export interface RendimientoActividad {
+  actividad_id?: string | null;
+  titulo: string;
+  sesiones: number;
+  tiempo_promedio: number;
+  tasa_acierto: number;
+}
+
+export interface GlobalResumen {
+  total_pacientes: number;
+  total_sesiones: number;
+  total_actividades: number;
+  tasa_acierto_promedio: number;
+  pacientes_activos_ultimos_7_dias: number;
+}
+
+export interface RankingPacienteItem {
+  paciente_id: string;
+  apodo: string;
+  edad?: number | null;
+  total_sesiones: number;
+  tasa_acierto_promedio: number;
+  tendencia: 'mejora' | 'estable' | 'retroceso' | 'sin_datos';
+  ultima_sesion?: string | null;
+}

@@ -2,6 +2,18 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { RefreshTokenResponse } from '../types/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+export const BACKEND_URL = API_BASE_URL.replace('/api/v1', '');
+
+export const resolveMediaUrl = (url: string) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+    return url;
+  }
+  if (url.startsWith('/')) {
+    return `${BACKEND_URL}${url}`;
+  }
+  return url;
+};
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -187,6 +199,51 @@ export const crearSesionPublica = async (data: {
   errores: number;
 }) => {
   const response = await api.post('/publico/sesiones', data);
+  return response.data;
+};
+
+// Endpoints de Métricas y Evaluación
+export const getResumenPaciente = async (pacienteId: string) => {
+  const response = await api.get(`/metricas/paciente/${pacienteId}/resumen`);
+  return response.data;
+};
+
+export const getEvolucionPaciente = async (
+  pacienteId: string,
+  params?: { desde?: string; hasta?: string; agrupacion?: 'dia' | 'semana' }
+) => {
+  const response = await api.get(`/metricas/paciente/${pacienteId}/evolucion`, { params });
+  return response.data;
+};
+
+export const getRendimientoPorActividad = async (pacienteId: string) => {
+  const response = await api.get(`/metricas/paciente/${pacienteId}/por-actividad`);
+  return response.data;
+};
+
+export const exportarSesionesCSV = async (pacienteId: string, apodo: string = 'paciente') => {
+  const response = await api.get(`/metricas/paciente/${pacienteId}/export?formato=csv`, {
+    responseType: 'blob',
+  });
+  // Disparar descarga automática en el navegador
+  const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `paciente_${apodo.replace(/\s+/g, '_')}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
+export const getGlobalResumen = async () => {
+  const response = await api.get('/metricas/global/resumen');
+  return response.data;
+};
+
+export const getRankingPacientes = async (orden: 'progreso' | 'actividad' = 'progreso') => {
+  const response = await api.get(`/metricas/global/ranking-pacientes?orden=${orden}`);
   return response.data;
 };
 

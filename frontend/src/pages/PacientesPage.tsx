@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { getPacientes, createPaciente, updatePaciente, deletePaciente } from '../services/api';
 import { Paciente } from '../types';
-import { UserPlus, Edit2, Trash2, X, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { UserPlus, Edit2, Trash2, X, AlertCircle, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
 
 
 export const PacientesPage: React.FC = () => {
+  const navigate = useNavigate();
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -172,6 +174,13 @@ export const PacientesPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right space-x-2">
+                          <button
+                            onClick={() => navigate(`/pacientes/${p.id}/metricas`)}
+                            className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                            title="Ver métricas y evolución"
+                          >
+                            <BarChart2 className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => openEditModal(p)}
                             className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"

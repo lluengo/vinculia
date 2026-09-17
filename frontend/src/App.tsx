@@ -10,6 +10,7 @@ import { PacientesPage } from './pages/PacientesPage';
 import { ActividadesPage } from './pages/ActividadesPage';
 import { ConfiguradorPage } from './pages/ConfiguradorPage';
 import { PlayPage } from './pages/PlayPage';
+import { PacienteMetricasPage } from './pages/PacienteMetricasPage';
 
 export const App: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ export const App: React.FC = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/pacientes" element={<PacientesPage />} />
+            <Route path="/pacientes/:id/metricas" element={<PacienteMetricasPage />} />
             <Route path="/actividades" element={<ActividadesPage />} />
             <Route path="/actividades/nueva" element={<ConfiguradorPage />} />
             <Route path="/actividades/:id/editar" element={<ConfiguradorPage />} />

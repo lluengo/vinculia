@@ -15,6 +15,18 @@ class Settings(BaseSettings):
     
     # Base de Datos PostgreSQL
     DATABASE_URL: str = "postgresql+asyncpg://postgres:Holamundo1123!@localhost:5433/vinculia"
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_database_url(cls, v: str) -> str:
+        if isinstance(v, str):
+            if v.startswith("postgres://"):
+                v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
+                v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+            if "sslmode=require" in v:
+                v = v.replace("sslmode=require", "ssl=require")
+        return v
     
     # Google OAuth
     GOOGLE_CLIENT_ID: str = "mock-google-client-id.apps.googleusercontent.com"

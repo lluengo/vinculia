@@ -24,7 +24,10 @@ import {
   Check,
   Copy,
   X,
+  Upload,
 } from 'lucide-react';
+import { MediaViewer } from '../components/MediaViewer';
+import { subirAssets } from '../services/api';
 
 export const ConfiguradorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -101,6 +104,24 @@ export const ConfiguradorPage: React.FC = () => {
     const newPares = [...pares];
     newPares[index] = { ...newPares[index], [field]: value };
     setPares(newPares);
+  };
+
+  const handleUploadFile = async (index: number, field: 'origen_url' | 'destino_url', file: File) => {
+    if (!savedId) {
+      alert('Guarda la actividad primero para poder subir y almacenar archivos de audio o imagen en el servidor.');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('files', file);
+
+    try {
+      const res = await subirAssets(savedId, formData);
+      if (res.uploaded_files && res.uploaded_files.length > 0) {
+        handleParChange(index, field, res.uploaded_files[0]);
+      }
+    } catch (err: any) {
+      alert('Error al subir el archivo: ' + (err.response?.data?.detail || 'Error en el servidor'));
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -264,14 +285,27 @@ export const ConfiguradorPage: React.FC = () => {
                           className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 shadow-sm text-xs font-semibold text-slate-700"
                         >
                           <div className="flex items-center gap-2 flex-1 truncate">
-                            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold">
+                            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
                               {i + 1}
                             </span>
-                            <span className="truncate">{par.origen_url || 'Elemento Origen'}</span>
+                            <div className="truncate">
+                              {par.origen_url ? (
+                                <MediaViewer content={par.origen_url} />
+                              ) : (
+                                <span className="text-slate-400 italic">Elemento Origen</span>
+                              )}
+                            </div>
                           </div>
-                          <span className="text-slate-300 font-bold px-2">➔</span>
-                          <div className="flex-1 truncate text-right text-blue-600">
-                            {par.destino_url || 'Elemento Destino'}
+                          <span className="text-slate-300 font-bold px-2 flex-shrink-0">➔</span>
+                          <div className="flex-1 truncate text-right text-blue-600 flex justify-end">
+                            {par.destino_url ? (
+                              <MediaViewer
+                                content={par.destino_url}
+                                isAudioDestino={modo === 'imagen-sonido'}
+                              />
+                            ) : (
+                              <span className="text-slate-400 italic">Elemento Destino</span>
+                            )}
                           </div>
                         </div>
                       ))
@@ -460,39 +494,112 @@ export const ConfiguradorPage: React.FC = () => {
                 </button>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {pares.map((par, index) => (
                   <div
                     key={index}
-                    className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3"
+                    className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3"
                   >
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        placeholder="Origen (URL o texto)"
-                        value={par.origen_url}
-                        onChange={(e) => handleParChange(index, 'origen_url', e.target.value)}
-                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+                      <span>Par #{index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePar(index)}
+                        className="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition"
+                        title="Eliminar este par"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <span className="text-slate-400 text-xs font-bold">➔</span>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        placeholder="Destino (URL o texto)"
-                        value={par.destino_url}
-                        onChange={(e) => handleParChange(index, 'destino_url', e.target.value)}
-                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                      {/* Origen */}
+                      <div className="space-y-1.5">
+                        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                          Origen (Texto, Emoji o Imagen)
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder="Ej: 🐶 o https://.../perro.png"
+                            value={par.origen_url}
+                            onChange={(e) => handleParChange(index, 'origen_url', e.target.value)}
+                            className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <label
+                            className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 cursor-pointer text-slate-500 hover:text-blue-600 transition"
+                            title="Subir imagen/archivo desde tu PC"
+                          >
+                            <Upload className="w-4 h-4" />
+                            <input
+                              type="file"
+                              accept="image/*,audio/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  handleUploadFile(index, 'origen_url', e.target.files[0]);
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Destino */}
+                      <div className="space-y-1.5">
+                        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                          {modo === 'imagen-sonido'
+                            ? 'Destino (URL Audio o archivo .mp3/.wav)'
+                            : 'Destino (Texto o Imagen)'}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder={
+                              modo === 'imagen-sonido'
+                                ? 'https://.../sonido.mp3'
+                                : 'Ej: 🦴 o https://.../hueso.png'
+                            }
+                            value={par.destino_url}
+                            onChange={(e) => handleParChange(index, 'destino_url', e.target.value)}
+                            className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <label
+                            className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 cursor-pointer text-slate-500 hover:text-blue-600 transition"
+                            title="Subir audio o archivo desde tu PC"
+                          >
+                            <Upload className="w-4 h-4" />
+                            <input
+                              type="file"
+                              accept="audio/*,image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  handleUploadFile(index, 'destino_url', e.target.files[0]);
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemovePar(index)}
-                      className="p-2 text-slate-400 hover:text-red-500 transition"
-                      title="Eliminar par"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                    {/* Preescucha / Vista Rápida del Par */}
+                    {(par.origen_url || par.destino_url) && (
+                      <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase font-bold text-slate-400">Preescucha:</span>
+                          <MediaViewer content={par.origen_url} />
+                        </div>
+                        <span className="text-slate-300 font-bold">➔</span>
+                        <div className="flex items-center gap-2">
+                          <MediaViewer
+                            content={par.destino_url}
+                            isAudioDestino={modo === 'imagen-sonido'}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

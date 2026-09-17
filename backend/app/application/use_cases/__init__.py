@@ -41,4 +41,19 @@ __all__ = [
     "DeleteActividadUseCase",
     "GenerarEnlaceUseCase",
     "GetActividadPublicaUseCase",
+    "GetPacienteResumenMetricasUseCase",
+    "GetPacienteEvolucionUseCase",
+    "GetPacientePorActividadUseCase",
+    "ExportarSesionesPacienteUseCase",
+    "GetGlobalResumenUseCase",
+    "GetRankingPacientesUseCase",
 ]
+
+from app.application.use_cases.metrica_use_cases import (
+    GetPacienteResumenMetricasUseCase,
+    GetPacienteEvolucionUseCase,
+    GetPacientePorActividadUseCase,
+    ExportarSesionesPacienteUseCase,
+    GetGlobalResumenUseCase,
+    GetRankingPacientesUseCase,
+)
